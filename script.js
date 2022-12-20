@@ -22,14 +22,19 @@ function getPostImage(mediaUrl, returnCB) {
 }
 getPosts(function (data) {
   var directives = {
+    // postmage: {
+    //   src: function () {
+    //     return getPostImage(
+    //       this._links['wp:featuredmedia'][0].href,
+    //       function (mediaDAta) {
+    //         return mediaDAta.source_url;
+    //       }
+    //     );
+    //   },
+    // },
     postmage: {
-      src: function () {
-        return getPostImage(
-          this._links['wp:featuredmedia'][0].href,
-          function (mediaDAta) {
-            return mediaDAta.source_url;
-          }
-        );
+      dataImage: function () {
+        return this._links['wp:featuredmedia'][0].href;
       },
     },
     postSummary: {
@@ -40,4 +45,18 @@ getPosts(function (data) {
   };
 
   $('.container').render(data, directives);
+
+  //load the images.
+  $('.container')
+    .find('img')
+    .each(function (index, image) {
+      var imageFetchUrl = $(image).attr('dataimage');
+      $.get(imageFetchUrl, function (mediaData) {
+        $(image).attr({
+          src: mediaData.source_url,
+          width: '100%',
+          height: '100%',
+        });
+      });
+    });
 });
